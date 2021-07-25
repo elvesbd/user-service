@@ -16,4 +16,7 @@ export class UserEntity {
 
   @Column()
   password: string;
+
+  @Column({ default: 'ACTIVATE' })
+  status: 'ACTIVATE' | 'INACTIVATE';
 }

@@ -11,11 +11,43 @@ export class AppService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
+  async find(userId: number): Promise<User> {
+    const user = await this.userRepository.findOne(userId);
+    const response: User = {
+      ...user,
+    };
+    return response;
+  }
+
   async findAll(): Promise<UserEntity[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({ where: { status: 'ACTIVATE' } });
   }
 
   async create(user: User): Promise<UserEntity> {
     return await this.userRepository.save(user);
+  }
+
+  async update(userData: User): Promise<void> {
+    const { id, name, email, phone, password } = userData;
+    const user = await this.find(id);
+
+    user.name = name ? name : user.name;
+    user.email = email ? email : user.email;
+    user.phone = phone ? phone : user.phone;
+    user.password = password ? password : user.password;
+
+    await this.userRepository.save(user);
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.userRepository.delete({ id });
+  }
+
+  async activate(id: number): Promise<void> {
+    await this.userRepository.update(id, { status: 'ACTIVATE' });
+  }
+
+  async inactivate(id: number): Promise<void> {
+    await this.userRepository.update(id, { status: 'INACTIVATE' });
   }
 }
